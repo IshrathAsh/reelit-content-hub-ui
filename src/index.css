@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,5 +98,16 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer utilities {
+  .hover\:shadow-neon:hover {
+    box-shadow: 0 0 30px rgba(255, 0, 122, 0.5), 0 0 60px rgba(255, 0, 122, 0.3);
+  }
+  
+  .hover\:shadow-neon-card:hover {
+    box-shadow: 0 0 20px rgba(255, 0, 122, 0.3), 0 0 40px rgba(0, 221, 235, 0.2);
   }
 }
