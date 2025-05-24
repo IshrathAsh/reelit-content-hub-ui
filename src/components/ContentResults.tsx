@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -76,7 +77,7 @@ ${content.transcript}
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-white">Content Ready!</h1>
-              <p className="text-sm" style={{ color: '#B0B0B0' }}>Copy and paste to any short video platform</p>
+              <p className="text-sm text-gray-400">Copy and paste to any short video platform</p>
             </div>
           </div>
           <Badge className="bg-green-500/20 text-green-400 border border-green-500/30">
@@ -102,11 +103,11 @@ ${content.transcript}
             <Copy className="w-5 h-5 mr-2" />
             Copy All Content
           </Button>
-          <Button variant="outline" size="lg" className="h-16 bg-white/5 border-white/10 text-white hover:bg-white/10">
+          <Button variant="outline" size="lg" className="h-16 bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-2xl">
             <Share2 className="w-5 h-5 mr-2" />
             Share Results
           </Button>
-          <Button variant="outline" size="lg" className="h-16 bg-white/5 border-white/10 text-white hover:bg-white/10">
+          <Button variant="outline" size="lg" className="h-16 bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-2xl">
             <Download className="w-5 h-5 mr-2" />
             Export
           </Button>
@@ -119,8 +120,7 @@ ${content.transcript}
           <Card className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                     style={{ background: 'linear-gradient(45deg, #FF007A, #FF6F00)' }}>
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center">
                   <MessageCircle className="w-4 h-4 text-white" />
                 </div>
                 <CardTitle className="text-lg text-white">Universal Caption</CardTitle>
@@ -140,7 +140,7 @@ ${content.transcript}
             </CardHeader>
             <CardContent>
               <p className="text-white leading-relaxed text-lg">{content.caption}</p>
-              <div className="mt-4 text-xs" style={{ color: '#B0B0B0' }}>
+              <div className="mt-4 text-xs text-gray-400">
                 {content.caption.length} characters • Works on all platforms
               </div>
             </CardContent>
@@ -150,8 +150,7 @@ ${content.transcript}
           <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                     style={{ background: 'linear-gradient(45deg, #FF6F00, #00DDEB)' }}>
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-cyan-400 flex items-center justify-center">
                   <Hash className="w-4 h-4 text-white" />
                 </div>
                 <CardTitle className="text-lg text-white">Hashtags</CardTitle>
@@ -177,7 +176,7 @@ ${content.transcript}
                   </Badge>
                 ))}
               </div>
-              <div className="mt-4 text-xs" style={{ color: '#B0B0B0' }}>
+              <div className="mt-4 text-xs text-gray-400">
                 {content.hashtags.length} hashtags
               </div>
             </CardContent>
@@ -187,8 +186,7 @@ ${content.transcript}
           <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                     style={{ background: 'linear-gradient(45deg, #00DDEB, #FF007A)' }}>
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-pink-500 flex items-center justify-center">
                   <FileText className="w-4 h-4 text-white" />
                 </div>
                 <CardTitle className="text-lg text-white">Description</CardTitle>
@@ -207,8 +205,8 @@ ${content.transcript}
               </Button>
             </CardHeader>
             <CardContent>
-              <p className="text-white leading-relaxed text-lg">{content.description}</p>
-              <div className="mt-4 text-xs" style={{ color: '#B0B0B0' }}>
+              <p className="text-white leading-relaxed">{content.description}</p>
+              <div className="mt-4 text-xs text-gray-400">
                 {content.description.length} characters
               </div>
             </CardContent>
@@ -236,11 +234,10 @@ ${content.transcript}
           )}
 
           {/* Transcript Card */}
-          <Card className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl">
+          <Card className="lg:col-span-3 bg-white/5 border border-white/10 backdrop-blur-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                     style={{ background: 'linear-gradient(45deg, #FF007A, #FF6F00)' }}>
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-cyan-400 flex items-center justify-center">
                   <FileText className="w-4 h-4 text-white" />
                 </div>
                 <CardTitle className="text-lg text-white">Full Transcript</CardTitle>
@@ -259,14 +256,14 @@ ${content.transcript}
               </Button>
             </CardHeader>
             <CardContent>
-              <p className="text-white leading-relaxed text-sm">{content.transcript}</p>
-              <div className="mt-4 text-xs" style={{ color: '#B0B0B0' }}>
+              <p className="text-white leading-relaxed">{content.transcript}</p>
+              <div className="mt-4 text-xs text-gray-400">
                 {content.transcript.length} characters • Full audio transcription
               </div>
             </CardContent>
           </Card>
 
-          {/* Usage Tips */}
+          {/* Platform Tips */}
           <Card className="lg:col-span-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
             <CardHeader>
               <CardTitle className="text-lg text-white">💡 Platform Tips</CardTitle>
@@ -274,23 +271,23 @@ ${content.transcript}
             <CardContent className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="text-center">
                 <h4 className="font-semibold text-red-400 mb-2">YouTube Shorts</h4>
-                <p className="text-xs" style={{ color: '#B0B0B0' }}>Use description for context</p>
+                <p className="text-xs text-gray-400">Use description for context</p>
               </div>
               <div className="text-center">
                 <h4 className="font-semibold text-pink-400 mb-2">TikTok</h4>
-                <p className="text-xs" style={{ color: '#B0B0B0' }}>Keep caption short & punchy</p>
+                <p className="text-xs text-gray-400">Keep caption short & punchy</p>
               </div>
               <div className="text-center">
                 <h4 className="font-semibold text-purple-400 mb-2">Instagram</h4>
-                <p className="text-xs" style={{ color: '#B0B0B0' }}>Add hashtags in comments</p>
+                <p className="text-xs text-gray-400">Add hashtags in comments</p>
               </div>
               <div className="text-center">
                 <h4 className="font-semibold text-blue-400 mb-2">Facebook</h4>
-                <p className="text-xs" style={{ color: '#B0B0B0' }}>Use full description</p>
+                <p className="text-xs text-gray-400">Use full description</p>
               </div>
               <div className="text-center">
                 <h4 className="font-semibold text-yellow-400 mb-2">Snapchat</h4>
-                <p className="text-xs" style={{ color: '#B0B0B0' }}>Focus on visual appeal</p>
+                <p className="text-xs text-gray-400">Focus on visual appeal</p>
               </div>
             </CardContent>
           </Card>
@@ -313,7 +310,7 @@ ${content.transcript}
               <Copy className="w-5 h-5 mr-2" />
               Copy All Content
             </Button>
-            <Button variant="outline" size="lg" className="h-14 bg-white/5 border-white/10 text-white hover:bg-white/10" onClick={onStartOver}>
+            <Button variant="outline" size="lg" className="h-14 bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-2xl" onClick={onStartOver}>
               Create Another
             </Button>
           </div>

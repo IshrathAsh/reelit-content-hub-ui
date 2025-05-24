@@ -1,11 +1,11 @@
+
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Upload, ArrowLeft, Video, Loader2 } from "lucide-react";
+import { Upload, ArrowLeft, Video, Loader2, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface VideoUploadProps {
@@ -32,7 +32,7 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
         });
         return;
       }
-      if (file.size > 50 * 1024 * 1024) { // 50MB limit
+      if (file.size > 50 * 1024 * 1024) {
         toast({
           title: "File too large",
           description: "Please upload a video smaller than 50MB.",
@@ -104,12 +104,12 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-white">Upload Video</h1>
-            <p className="text-sm" style={{ color: '#B0B0B0' }}>Upload your video and let AI create content for all platforms</p>
+            <p className="text-sm text-gray-400">Upload your video and let AI create content for all platforms</p>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-6 py-16 max-w-4xl">
+      <div className="container mx-auto px-6 py-16 max-w-6xl">
         {/* Bento Grid Layout */}
         <div className="grid lg:grid-cols-3 gap-6">
           
@@ -120,11 +120,11 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
                 <Video className="w-5 h-5" />
                 Video Upload
               </CardTitle>
-              <CardDescription style={{ color: '#B0B0B0' }}>
+              <CardDescription className="text-gray-400">
                 Upload an MP4 video (max 30 seconds, 50MB) for YouTube Shorts, TikTok, Instagram Reels, Facebook Reels, Snapchat & more
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="text-center">
                 <input
                   ref={fileInputRef}
@@ -133,27 +133,40 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
                   onChange={handleFileSelect}
                   className="hidden"
                 />
-                <Button
-                  variant="outline"
+                <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full h-32 border-2 border-dashed border-white/10 hover:border-white/20"
+                  className="border-2 border-dashed border-white/20 rounded-2xl p-12 cursor-pointer hover:border-white/40 hover:bg-white/5 transition-all duration-300"
                 >
                   <div className="text-center">
-                    <Upload className="w-8 h-8 mx-auto mb-2 text-white" />
-                    <p className="text-sm text-white">
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                         style={{ 
+                           background: selectedFile 
+                             ? 'linear-gradient(45deg, #FF007A, #FF6F00, #00DDEB)' 
+                             : 'rgba(255, 255, 255, 0.1)'
+                         }}>
+                      {selectedFile ? (
+                        <CheckCircle className="w-8 h-8 text-white" />
+                      ) : (
+                        <Upload className="w-8 h-8 text-white/60" />
+                      )}
+                    </div>
+                    <p className="text-white font-medium mb-2">
                       {selectedFile ? selectedFile.name : "Click to select video"}
                     </p>
+                    <p className="text-sm text-gray-400">
+                      MP4 format, up to 50MB
+                    </p>
                   </div>
-                </Button>
+                </div>
               </div>
 
               {selectedFile && (
-                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="flex items-center gap-2">
-                    <Video className="w-5 h-5 text-green-600" />
+                <div className="p-4 bg-green-500/10 rounded-xl border border-green-500/20">
+                  <div className="flex items-center gap-3">
+                    <Video className="w-5 h-5 text-green-400" />
                     <div>
-                      <p className="font-medium text-green-800">{selectedFile.name}</p>
-                      <p className="text-sm text-green-600">
+                      <p className="font-medium text-green-400">{selectedFile.name}</p>
+                      <p className="text-sm text-green-300">
                         {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
                       </p>
                     </div>
@@ -167,7 +180,7 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
           <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
             <CardHeader>
               <CardTitle className="text-white">Customize</CardTitle>
-              <CardDescription style={{ color: '#B0B0B0' }}>
+              <CardDescription className="text-gray-400">
                 Optional platform-specific instructions
               </CardDescription>
             </CardHeader>
@@ -185,7 +198,7 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
 
               <div className="pt-4 border-t border-white/10">
                 <h4 className="font-medium mb-3 text-white">You'll get:</h4>
-                <ul className="text-sm space-y-2" style={{ color: '#B0B0B0' }}>
+                <ul className="text-sm space-y-2 text-gray-400">
                   <li>• Video transcript</li>
                   <li>• Platform-ready caption</li>
                   <li>• Relevant hashtags</li>
@@ -198,27 +211,36 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
 
         {/* Processing Section */}
         {isProcessing && (
-          <Card className="mt-8">
-            <CardContent className="pt-6">
-              <div className="text-center space-y-4">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto text-purple-600" />
-                <h3 className="font-semibold">Processing Your Video...</h3>
-                <Progress value={progress} className="w-full max-w-md mx-auto" />
-                <p className="text-sm text-gray-600">
-                  This usually takes about 1 minute
-                </p>
+          <Card className="mt-8 bg-white/5 border border-white/10 backdrop-blur-xl">
+            <CardContent className="pt-8 pb-8">
+              <div className="text-center space-y-6">
+                <Loader2 className="w-12 h-12 animate-spin mx-auto text-white" />
+                <div>
+                  <h3 className="font-semibold text-white mb-2">Processing Your Video</h3>
+                  <p className="text-sm text-gray-400">
+                    This usually takes about 1 minute
+                  </p>
+                </div>
+                <Progress value={progress} className="w-full max-w-md mx-auto h-2" />
               </div>
             </CardContent>
           </Card>
         )}
 
         {/* Action Button */}
-        <div className="mt-8 text-center">
+        <div className="mt-12 text-center">
           <Button
             size="lg"
             onClick={handleProcess}
             disabled={!selectedFile || isProcessing}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3"
+            className="px-12 py-4 text-lg font-semibold rounded-2xl disabled:opacity-50 transition-all duration-300"
+            style={{
+              background: selectedFile && !isProcessing 
+                ? 'linear-gradient(45deg, #FF007A, #FF6F00, #00DDEB)' 
+                : 'rgba(255, 255, 255, 0.1)',
+              color: 'white',
+              border: 'none'
+            }}
           >
             {isProcessing ? (
               <>
