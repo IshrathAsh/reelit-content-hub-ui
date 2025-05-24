@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,89 +65,105 @@ ${content.transcript}
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="min-h-screen" style={{ backgroundColor: '#1C2526' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center">
-          <Button variant="ghost" onClick={onStartOver} className="mr-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Start Over
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Your Content is Ready! 🎉</h1>
-            <p className="text-gray-600">Copy and paste directly to Instagram</p>
+      <header className="border-b border-white/10 bg-black/20 backdrop-blur-xl sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <Button variant="ghost" onClick={onStartOver} className="mr-4 text-white hover:bg-white/10">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Start Over
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-white">Content Ready!</h1>
+              <p className="text-sm" style={{ color: '#B0B0B0' }}>Copy and paste to any short video platform</p>
+            </div>
           </div>
+          <Badge className="bg-green-500/20 text-green-400 border border-green-500/30">
+            <Check className="w-4 h-4 mr-1" />
+            Ready
+          </Badge>
         </div>
-        <Badge className="bg-green-100 text-green-700">
-          <Check className="w-4 h-4 mr-1" />
-          Generated in ~1 minute
-        </Badge>
-      </div>
+      </header>
 
-      {/* Quick Actions */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8">
-        <Button
-          size="lg"
-          onClick={copyAllContent}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-        >
-          <Copy className="w-5 h-5 mr-2" />
-          Copy All Content
-        </Button>
-        <Button variant="outline" size="lg">
-          <Share2 className="w-5 h-5 mr-2" />
-          Share Results
-        </Button>
-        <Button variant="outline" size="lg">
-          <Download className="w-5 h-5 mr-2" />
-          Export as Text
-        </Button>
-      </div>
+      <div className="container mx-auto px-6 py-16 max-w-7xl">
+        {/* Quick Actions */}
+        <div className="grid md:grid-cols-3 gap-4 mb-12">
+          <Button
+            size="lg"
+            onClick={copyAllContent}
+            className="h-16 text-lg font-semibold rounded-2xl transition-all duration-300"
+            style={{
+              background: 'linear-gradient(45deg, #FF007A, #FF6F00, #00DDEB)',
+              color: 'white',
+              border: 'none'
+            }}
+          >
+            <Copy className="w-5 h-5 mr-2" />
+            Copy All Content
+          </Button>
+          <Button variant="outline" size="lg" className="h-16 bg-white/5 border-white/10 text-white hover:bg-white/10">
+            <Share2 className="w-5 h-5 mr-2" />
+            Share Results
+          </Button>
+          <Button variant="outline" size="lg" className="h-16 bg-white/5 border-white/10 text-white hover:bg-white/10">
+            <Download className="w-5 h-5 mr-2" />
+            Export
+          </Button>
+        </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        {/* Content Cards */}
-        <div className="space-y-6">
-          {/* Caption Card */}
-          <Card className="border-l-4 border-l-green-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        {/* Bento Grid Layout */}
+        <div className="grid lg:grid-cols-4 gap-6">
+          
+          {/* Caption Card - Large */}
+          <Card className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div className="flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-green-600" />
-                <CardTitle className="text-lg">Instagram Caption</CardTitle>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+                     style={{ background: 'linear-gradient(45deg, #FF007A, #FF6F00)' }}>
+                  <MessageCircle className="w-4 h-4 text-white" />
+                </div>
+                <CardTitle className="text-lg text-white">Universal Caption</CardTitle>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => copyToClipboard(content.caption, "Caption")}
+                className="text-white hover:bg-white/10"
               >
                 {copiedItems.includes("Caption") ? (
-                  <Check className="w-4 h-4 text-green-600" />
+                  <Check className="w-4 h-4 text-green-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
               </Button>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-800 leading-relaxed">{content.caption}</p>
-              <div className="mt-2 text-xs text-gray-500">
-                {content.caption.length} characters
+              <p className="text-white leading-relaxed text-lg">{content.caption}</p>
+              <div className="mt-4 text-xs" style={{ color: '#B0B0B0' }}>
+                {content.caption.length} characters • Works on all platforms
               </div>
             </CardContent>
           </Card>
 
           {/* Hashtags Card */}
-          <Card className="border-l-4 border-l-blue-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div className="flex items-center gap-2">
-                <Hash className="w-5 h-5 text-blue-600" />
-                <CardTitle className="text-lg">Hashtags</CardTitle>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+                     style={{ background: 'linear-gradient(45deg, #FF6F00, #00DDEB)' }}>
+                  <Hash className="w-4 h-4 text-white" />
+                </div>
+                <CardTitle className="text-lg text-white">Hashtags</CardTitle>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => copyToClipboard(formatHashtags(content.hashtags), "Hashtags")}
+                className="text-white hover:bg-white/10"
               >
                 {copiedItems.includes("Hashtags") ? (
-                  <Check className="w-4 h-4 text-green-600" />
+                  <Check className="w-4 h-4 text-green-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
@@ -157,61 +172,62 @@ ${content.transcript}
             <CardContent>
               <div className="flex flex-wrap gap-2">
                 {content.hashtags.map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="bg-blue-50 text-blue-700">
+                  <Badge key={index} variant="secondary" className="bg-white/10 text-white border-none">
                     {tag.startsWith('#') ? tag : `#${tag}`}
                   </Badge>
                 ))}
               </div>
-              <div className="mt-2 text-xs text-gray-500">
+              <div className="mt-4 text-xs" style={{ color: '#B0B0B0' }}>
                 {content.hashtags.length} hashtags
               </div>
             </CardContent>
           </Card>
 
           {/* Description Card */}
-          <Card className="border-l-4 border-l-purple-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-purple-600" />
-                <CardTitle className="text-lg">Description</CardTitle>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+                     style={{ background: 'linear-gradient(45deg, #00DDEB, #FF007A)' }}>
+                  <FileText className="w-4 h-4 text-white" />
+                </div>
+                <CardTitle className="text-lg text-white">Description</CardTitle>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => copyToClipboard(content.description, "Description")}
+                className="text-white hover:bg-white/10"
               >
                 {copiedItems.includes("Description") ? (
-                  <Check className="w-4 h-4 text-green-600" />
+                  <Check className="w-4 h-4 text-green-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
               </Button>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-800 leading-relaxed">{content.description}</p>
-              <div className="mt-2 text-xs text-gray-500">
+              <p className="text-white leading-relaxed text-lg">{content.description}</p>
+              <div className="mt-4 text-xs" style={{ color: '#B0B0B0' }}>
                 {content.description.length} characters
               </div>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Transcript and Video Preview */}
-        <div className="space-y-6">
           {/* Video Preview */}
           {content.videoFile && (
-            <Card>
+            <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-white">
                   <Video className="w-5 h-5" />
                   Video Preview
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-gray-100 rounded-lg p-8 text-center">
-                  <Video className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600">{content.videoFile.name}</p>
-                  <p className="text-sm text-gray-500">
+                <div className="bg-black/20 rounded-lg p-6 text-center">
+                  <Video className="w-16 h-16 mx-auto text-white/20 mb-4" />
+                  <p className="text-white">{content.videoFile.name}</p>
+                  <p className="text-sm text-white/50">
                     {(content.videoFile.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
                 </div>
@@ -220,74 +236,91 @@ ${content.transcript}
           )}
 
           {/* Transcript Card */}
-          <Card className="border-l-4 border-l-orange-500">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Card className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-orange-600" />
-                <CardTitle className="text-lg">Full Transcript</CardTitle>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+                     style={{ background: 'linear-gradient(45deg, #FF007A, #FF6F00)' }}>
+                  <FileText className="w-4 h-4 text-white" />
+                </div>
+                <CardTitle className="text-lg text-white">Full Transcript</CardTitle>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => copyToClipboard(content.transcript, "Transcript")}
+                className="text-white hover:bg-white/10"
               >
                 {copiedItems.includes("Transcript") ? (
-                  <Check className="w-4 h-4 text-green-600" />
+                  <Check className="w-4 h-4 text-green-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
               </Button>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-800 leading-relaxed text-sm">{content.transcript}</p>
-              <div className="mt-2 text-xs text-gray-500">
+              <p className="text-white leading-relaxed text-sm">{content.transcript}</p>
+              <div className="mt-4 text-xs" style={{ color: '#B0B0B0' }}>
                 {content.transcript.length} characters • Full audio transcription
               </div>
             </CardContent>
           </Card>
 
           {/* Usage Tips */}
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+          <Card className="lg:col-span-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
             <CardHeader>
-              <CardTitle className="text-lg text-purple-800">💡 Usage Tips</CardTitle>
+              <CardTitle className="text-lg text-white">💡 Platform Tips</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <p className="text-sm text-purple-700">
-                • Copy the caption first, then add hashtags in comments
-              </p>
-              <p className="text-sm text-purple-700">
-                • Use the description for your bio or story
-              </p>
-              <p className="text-sm text-purple-700">
-                • Save the transcript for future reference
-              </p>
-              <p className="text-sm text-purple-700">
-                • Post during peak hours for maximum engagement
-              </p>
+            <CardContent className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="text-center">
+                <h4 className="font-semibold text-red-400 mb-2">YouTube Shorts</h4>
+                <p className="text-xs" style={{ color: '#B0B0B0' }}>Use description for context</p>
+              </div>
+              <div className="text-center">
+                <h4 className="font-semibold text-pink-400 mb-2">TikTok</h4>
+                <p className="text-xs" style={{ color: '#B0B0B0' }}>Keep caption short & punchy</p>
+              </div>
+              <div className="text-center">
+                <h4 className="font-semibold text-purple-400 mb-2">Instagram</h4>
+                <p className="text-xs" style={{ color: '#B0B0B0' }}>Add hashtags in comments</p>
+              </div>
+              <div className="text-center">
+                <h4 className="font-semibold text-blue-400 mb-2">Facebook</h4>
+                <p className="text-xs" style={{ color: '#B0B0B0' }}>Use full description</p>
+              </div>
+              <div className="text-center">
+                <h4 className="font-semibold text-yellow-400 mb-2">Snapchat</h4>
+                <p className="text-xs" style={{ color: '#B0B0B0' }}>Focus on visual appeal</p>
+              </div>
             </CardContent>
           </Card>
         </div>
-      </div>
 
-      {/* Footer Actions */}
-      <div className="mt-12 text-center space-y-4">
-        <Separator />
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button
-            size="lg"
-            onClick={copyAllContent}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8"
-          >
-            <Copy className="w-5 h-5 mr-2" />
-            Copy All Content
-          </Button>
-          <Button variant="outline" size="lg" onClick={onStartOver}>
-            Create Another
-          </Button>
+        {/* Footer Actions */}
+        <div className="mt-12 text-center space-y-4">
+          <Separator className="bg-white/20" />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button
+              size="lg"
+              onClick={copyAllContent}
+              className="h-14 text-lg rounded-2xl transition-all duration-300"
+              style={{
+                background: 'linear-gradient(45deg, #FF007A, #FF6F00, #00DDEB)',
+                color: 'white',
+                border: 'none'
+              }}
+            >
+              <Copy className="w-5 h-5 mr-2" />
+              Copy All Content
+            </Button>
+            <Button variant="outline" size="lg" className="h-14 bg-white/5 border-white/10 text-white hover:bg-white/10" onClick={onStartOver}>
+              Create Another
+            </Button>
+          </div>
+          <p className="text-sm text-white/60">
+            Content generated and ready to share!
+          </p>
         </div>
-        <p className="text-sm text-gray-500">
-          Content generated and ready for Instagram! 🚀
-        </p>
       </div>
     </div>
   );

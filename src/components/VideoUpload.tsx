@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +48,6 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
     setIsProcessing(true);
     setProgress(0);
 
-    // Simulate processing steps
     const steps = [
       { message: "Extracting audio...", progress: 20 },
       { message: "Generating transcript...", progress: 40 },
@@ -67,7 +65,6 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
       });
     }
 
-    // Generate mock content (in real app, this would come from AI)
     const mockContent = {
       transcript: "Hey everyone! Today I'm sharing my morning routine that has completely transformed my productivity. Starting with a 5-minute meditation, then a quick workout, and finishing with a healthy breakfast. Try it out and let me know how it works for you!",
       caption: "✨ Morning routine that changed my life! Who else loves starting the day right? 🌅",
@@ -76,7 +73,6 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
       videoFile: selectedFile
     };
 
-    // Add custom prompt influence
     if (customPrompt.toLowerCase().includes('funny')) {
       mockContent.caption = "😂 My morning routine be like: snooze, panic, coffee, pretend I'm productive ☕";
     }
@@ -98,143 +94,145 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen" style={{ backgroundColor: '#1C2526' }}>
       {/* Header */}
-      <div className="flex items-center mb-8">
-        <Button variant="ghost" onClick={onBack} className="mr-4">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Upload Your Video</h1>
-          <p className="text-gray-600">Upload your video and let AI create your Instagram content</p>
+      <header className="border-b border-white/10 bg-black/20 backdrop-blur-xl sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4 flex items-center">
+          <Button variant="ghost" onClick={onBack} className="mr-4 text-white hover:bg-white/10">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-white">Upload Video</h1>
+            <p className="text-sm" style={{ color: '#B0B0B0' }}>Upload your video and let AI create content for all platforms</p>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        {/* Upload Section */}
-        <Card className="border-2 border-dashed border-gray-300 hover:border-purple-400 transition-colors">
-          <CardHeader className="text-center">
-            <CardTitle className="flex items-center justify-center gap-2">
-              <Video className="w-5 h-5" />
-              Video Upload
-            </CardTitle>
-            <CardDescription>
-              Upload an MP4 video (max 30 seconds, 50MB)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="video/mp4"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-              <Button
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full h-32 border-2 border-dashed border-gray-300 hover:border-purple-400"
-              >
-                <div className="text-center">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-600">
-                    {selectedFile ? selectedFile.name : "Click to select video"}
-                  </p>
-                </div>
-              </Button>
-            </div>
-
-            {selectedFile && (
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="flex items-center gap-2">
-                  <Video className="w-5 h-5 text-green-600" />
-                  <div>
-                    <p className="font-medium text-green-800">{selectedFile.name}</p>
-                    <p className="text-sm text-green-600">
-                      {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+      <div className="container mx-auto px-6 py-16 max-w-4xl">
+        {/* Bento Grid Layout */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          
+          {/* Upload Section - Takes 2 columns */}
+          <Card className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-white">
+                <Video className="w-5 h-5" />
+                Video Upload
+              </CardTitle>
+              <CardDescription style={{ color: '#B0B0B0' }}>
+                Upload an MP4 video (max 30 seconds, 50MB) for YouTube Shorts, TikTok, Instagram Reels, Facebook Reels, Snapchat & more
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="video/mp4"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full h-32 border-2 border-dashed border-white/10 hover:border-white/20"
+                >
+                  <div className="text-center">
+                    <Upload className="w-8 h-8 mx-auto mb-2 text-white" />
+                    <p className="text-sm text-white">
+                      {selectedFile ? selectedFile.name : "Click to select video"}
                     </p>
                   </div>
-                </div>
+                </Button>
               </div>
+
+              {selectedFile && (
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center gap-2">
+                    <Video className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="font-medium text-green-800">{selectedFile.name}</p>
+                      <p className="text-sm text-green-600">
+                        {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Settings Section */}
+          <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
+            <CardHeader>
+              <CardTitle className="text-white">Customize</CardTitle>
+              <CardDescription style={{ color: '#B0B0B0' }}>
+                Optional platform-specific instructions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="prompt" className="text-white mb-2 block">Custom Prompt</Label>
+                <Textarea
+                  id="prompt"
+                  placeholder="e.g., 'TikTok style', 'YouTube tone', 'Professional'"
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-white/20"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-white/10">
+                <h4 className="font-medium mb-3 text-white">You'll get:</h4>
+                <ul className="text-sm space-y-2" style={{ color: '#B0B0B0' }}>
+                  <li>• Video transcript</li>
+                  <li>• Platform-ready caption</li>
+                  <li>• Relevant hashtags</li>
+                  <li>• Short description</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Processing Section */}
+        {isProcessing && (
+          <Card className="mt-8">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto text-purple-600" />
+                <h3 className="font-semibold">Processing Your Video...</h3>
+                <Progress value={progress} className="w-full max-w-md mx-auto" />
+                <p className="text-sm text-gray-600">
+                  This usually takes about 1 minute
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Action Button */}
+        <div className="mt-8 text-center">
+          <Button
+            size="lg"
+            onClick={handleProcess}
+            disabled={!selectedFile || isProcessing}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <Upload className="w-5 h-5 mr-2" />
+                Generate Content
+              </>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Settings Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Customization (Optional)</CardTitle>
-            <CardDescription>
-              Add custom instructions to personalize your content
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="prompt">Custom Prompt</Label>
-              <Textarea
-                id="prompt"
-                placeholder="e.g., 'Make it funny', 'Use business tone', 'Add call to action'"
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                className="mt-2"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                This will influence how AI generates your content
-              </p>
-            </div>
-
-            <div className="pt-4 border-t">
-              <h4 className="font-medium mb-2">What you'll get:</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Accurate video transcript</li>
-                <li>• Engaging Instagram caption</li>
-                <li>• 5-10 relevant hashtags</li>
-                <li>• Short description</li>
-                <li>• One-click copy functionality</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Processing Section */}
-      {isProcessing && (
-        <Card className="mt-8">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-purple-600" />
-              <h3 className="font-semibold">Processing Your Video...</h3>
-              <Progress value={progress} className="w-full max-w-md mx-auto" />
-              <p className="text-sm text-gray-600">
-                This usually takes about 1 minute
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Action Button */}
-      <div className="mt-8 text-center">
-        <Button
-          size="lg"
-          onClick={handleProcess}
-          disabled={!selectedFile || isProcessing}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3"
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            <>
-              <Upload className="w-5 h-5 mr-2" />
-              Generate Content
-            </>
-          )}
-        </Button>
+          </Button>
+        </div>
       </div>
     </div>
   );
