@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,7 +15,8 @@
     "server": "ts-node server/index.ts",
     "server:dev": "nodemon --exec ts-node server/index.ts",
     "server:build": "tsc -p server/tsconfig.json",
-    "server:start": "node dist/server/index.js"
+    "server:start": "node dist/server/index.js",
+    "start": "node server.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.817.0",
