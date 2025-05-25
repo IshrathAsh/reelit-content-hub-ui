@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +8,13 @@ import { Upload, ArrowLeft, Video, Loader2, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface VideoUploadProps {
-  onContentGenerated: (content: any) => void;
+  onContentGenerated: (content: {
+    transcript: string;
+    caption: string;
+    hashtags: string[];
+    description: string;
+    videoFile?: File;
+  }) => void;
   onBack: () => void;
 }
 
@@ -24,15 +29,20 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type !== "video/mp4") {
+      // Check file type
+      const validTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo'];
+      if (!validTypes.includes(file.type)) {
         toast({
           title: "Invalid file type",
-          description: "Please upload an MP4 video file.",
+          description: "Please upload an MP4, MOV, or AVI video file.",
           variant: "destructive",
         });
         return;
       }
-      if (file.size > 50 * 1024 * 1024) {
+
+      // Check file size (50MB limit)
+      const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+      if (file.size > maxSize) {
         toast({
           title: "File too large",
           description: "Please upload a video smaller than 50MB.",
@@ -40,45 +50,73 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
         });
         return;
       }
+
+      // If all validations pass, set the file
       setSelectedFile(file);
     }
   };
 
   const simulateAIProcessing = async () => {
-    setIsProcessing(true);
-    setProgress(0);
+    try {
+      setIsProcessing(true);
+      setProgress(0);
 
-    const steps = [
-      { message: "Extracting audio...", progress: 20 },
-      { message: "Generating transcript...", progress: 40 },
-      { message: "Creating caption...", progress: 60 },
-      { message: "Finding hashtags...", progress: 80 },
-      { message: "Finalizing content...", progress: 100 },
-    ];
+      const steps = [
+        { message: "Analyzing video...", progress: 10 },
+        { message: "Extracting audio...", progress: 25 },
+        { message: "Generating transcript...", progress: 40 },
+        { message: "Creating caption...", progress: 60 },
+        { message: "Finding hashtags...", progress: 75 },
+        { message: "Optimizing for platforms...", progress: 90 },
+        { message: "Finalizing content...", progress: 100 },
+      ];
 
-    for (const step of steps) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setProgress(step.progress);
+      for (const step of steps) {
+        // Simulate variable processing time
+        const delay = Math.random() * 1000 + 500; // Random delay between 500ms and 1500ms
+        await new Promise(resolve => setTimeout(resolve, delay));
+        
+        setProgress(step.progress);
+        toast({
+          title: step.message,
+          description: "Processing your video...",
+        });
+      }
+
+      // Simulate a small delay before completion
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const mockContent = {
+        transcript: "Hey everyone! Today I'm sharing my morning routine that has completely transformed my productivity. Starting with a 5-minute meditation, then a quick workout, and finishing with a healthy breakfast. Try it out and let me know how it works for you!",
+        caption: "✨ Morning routine that changed my life! Who else loves starting the day right? 🌅",
+        hashtags: ["#morningroutine", "#productivity", "#wellness", "#motivation", "#lifestyle", "#selfcare", "#healthyhabits", "#mindfulness"],
+        description: "Transform your mornings with this simple routine! Meditation + exercise + healthy breakfast = unstoppable energy all day long.",
+        videoFile: selectedFile
+      };
+
+      // Apply custom prompt if provided
+      if (customPrompt) {
+        const prompt = customPrompt.toLowerCase();
+        if (prompt.includes('funny')) {
+          mockContent.caption = "😂 My morning routine be like: snooze, panic, coffee, pretend I'm productive ☕";
+        } else if (prompt.includes('professional')) {
+          mockContent.caption = "📈 Elevate your morning routine with these proven productivity techniques. Transform your day before it begins.";
+        } else if (prompt.includes('tiktok')) {
+          mockContent.caption = "POV: When you finally find the perfect morning routine 🎯 #morningroutine #productivity";
+        }
+      }
+
+      onContentGenerated(mockContent);
+    } catch (error) {
+      console.error('Processing failed:', error);
       toast({
-        title: step.message,
-        description: "Processing your video...",
+        title: "Processing Failed",
+        description: "Please try again or contact support if the issue persists.",
+        variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
-
-    const mockContent = {
-      transcript: "Hey everyone! Today I'm sharing my morning routine that has completely transformed my productivity. Starting with a 5-minute meditation, then a quick workout, and finishing with a healthy breakfast. Try it out and let me know how it works for you!",
-      caption: "✨ Morning routine that changed my life! Who else loves starting the day right? 🌅",
-      hashtags: ["#morningroutine", "#productivity", "#wellness", "#motivation", "#lifestyle", "#selfcare", "#healthyhabits", "#mindfulness"],
-      description: "Transform your mornings with this simple routine! Meditation + exercise + healthy breakfast = unstoppable energy all day long.",
-      videoFile: selectedFile
-    };
-
-    if (customPrompt.toLowerCase().includes('funny')) {
-      mockContent.caption = "😂 My morning routine be like: snooze, panic, coffee, pretend I'm productive ☕";
-    }
-
-    onContentGenerated(mockContent);
-    setIsProcessing(false);
   };
 
   const handleProcess = () => {
@@ -102,26 +140,28 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Upload Video</h1>
-            <p className="text-sm text-gray-400">Upload your video and let AI create content for all platforms</p>
+          <div className="flex items-center space-x-3">
+            <img src="/logo.png" alt="Reelit Logo" className="w-32 h-auto" />
+            <div>
+              <h1 className="text-2xl font-bold text-white">Upload Video</h1>
+              <p className="text-sm text-gray-400">Upload your video and let AI create content for all platforms</p>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-6 py-16 max-w-6xl">
+      <div className="container mx-auto px-6 py-16 max-w-7xl">
         {/* Bento Grid Layout */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          
-          {/* Upload Section - Takes 2 columns */}
-          <Card className="lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl">
+        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+          {/* Upload Section - Large */}
+          <Card className="md:col-span-2 lg:col-span-4 bg-white/5 border border-white/10 backdrop-blur-xl">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
                 <Video className="w-5 h-5" />
                 Video Upload
               </CardTitle>
               <CardDescription className="text-gray-400">
-                Upload an MP4 video (max 30 seconds, 50MB) for YouTube Shorts, TikTok, Instagram Reels, Facebook Reels, Snapchat & more
+                Upload an MP4 video (max 50MB) for YouTube Shorts, TikTok, Instagram Reels, Facebook Reels, Snapchat & more
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -129,7 +169,7 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="video/mp4"
+                  accept="video/mp4,video/quicktime,video/x-msvideo"
                   onChange={handleFileSelect}
                   className="hidden"
                 />
@@ -177,7 +217,7 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
           </Card>
 
           {/* Settings Section */}
-          <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
+          <Card className="md:col-span-2 lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl">
             <CardHeader>
               <CardTitle className="text-white">Customize</CardTitle>
               <CardDescription className="text-gray-400">
@@ -211,7 +251,7 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
 
         {/* Processing Section */}
         {isProcessing && (
-          <Card className="mt-8 bg-white/5 border border-white/10 backdrop-blur-xl">
+          <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
             <CardContent className="pt-8 pb-8">
               <div className="text-center space-y-6">
                 <Loader2 className="w-12 h-12 animate-spin mx-auto text-white" />

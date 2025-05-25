@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,13 +6,22 @@ import { Upload, Zap, Copy, Clock, Sparkles, Play, MessageSquare, Hash, FileText
 import { VideoUpload } from "@/components/VideoUpload";
 import { ContentResults } from "@/components/ContentResults";
 import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+type GeneratedContent = {
+  transcript: string;
+  caption: string;
+  hashtags: string[];
+  description: string;
+  videoFile?: File;
+};
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<'landing' | 'upload' | 'results'>('landing');
-  const [generatedContent, setGeneratedContent] = useState(null);
+  const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const { toast } = useToast();
 
-  const handleVideoProcessed = (content: any) => {
+  const handleVideoProcessed = (content: GeneratedContent) => {
     setGeneratedContent(content);
     setCurrentStep('results');
     toast({
@@ -46,38 +54,83 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#1C2526' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#000000' }}>
       {/* Header */}
       <header className="border-b border-white/10 bg-black/20 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                 style={{ 
-                   background: 'linear-gradient(45deg, #FF007A, #FF6F00, #00DDEB)',
-                 }}>
-              <Zap className="w-5 h-5 text-black fill-current" />
-            </div>
-            <h1 className="text-2xl font-bold tracking-wide uppercase text-white">
-              REELIT
-            </h1>
+            <img src="/logo.png" alt="Reelit Logo" className="w-32 h-auto" />
           </div>
-          <Badge variant="secondary" className="bg-white/5 text-white border border-white/10">
-            Beta
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="secondary" className="bg-white/5 text-white border border-white/10">
+                  Beta
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>This is a beta version - we're still testing and improving features</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="text-center mb-16 max-w-4xl mx-auto">
-          <h2 className="text-5xl md:text-6xl font-light mb-6 text-white leading-tight">
-            Create stunning
-            <span className="block font-bold bg-gradient-to-r from-pink-500 via-orange-500 to-cyan-400 bg-clip-text text-transparent">
-              short video content
-            </span>
-            in seconds
-          </h2>
-          <p className="text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto">
+      <section className="container mx-auto px-6 py-20 relative overflow-hidden">
+        {/* Spline 3D Background */}
+        <div className="absolute inset-0 w-full h-[120%] -top-20 pointer-events-none">
+          <iframe 
+            src='https://my.spline.design/hypnotism-n9xoBObAfvQiYOW4eDYDGtST/' 
+            frameBorder='0' 
+            className="w-full h-full opacity-70"
+          />
+        </div>
+
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-pink-500/10 to-cyan-400/10 rounded-full blur-3xl animate-float" />
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-orange-500/10 to-pink-500/10 rounded-full blur-3xl animate-float-delayed" />
+        </div>
+
+        {/* Animated Illustration */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none opacity-30 -z-10">
+          <div className="relative w-full h-full">
+            {/* Camera Body */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-32 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20 animate-pulse-slow" />
+            
+            {/* Camera Lens */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-gradient-to-br from-pink-500/30 to-cyan-400/30 backdrop-blur-sm border border-white/20 animate-pulse-slow" />
+            
+            {/* Floating Elements */}
+            <div className="absolute left-1/4 top-1/4 w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500/20 to-orange-500/20 backdrop-blur-sm border border-white/20 animate-float" />
+            <div className="absolute right-1/4 top-1/3 w-10 h-10 rounded-full bg-gradient-to-br from-orange-500/20 to-cyan-400/20 backdrop-blur-sm border border-white/20 animate-float-delayed" />
+            <div className="absolute left-1/3 bottom-1/4 w-14 h-14 rounded-lg bg-gradient-to-br from-cyan-400/20 to-pink-500/20 backdrop-blur-sm border border-white/20 animate-float" />
+            
+            {/* Connection Lines */}
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 500 500">
+              <path
+                d="M250,250 L200,200 M250,250 L300,200 M250,250 L200,300 M250,250 L300,300"
+                stroke="rgba(255,255,255,0.2)"
+                strokeWidth="2"
+                fill="none"
+                className="animate-draw-line"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div className="text-center mb-16 max-w-4xl mx-auto relative z-10">
+          <div className="relative perspective-1000">
+            <h2 className="text-5xl md:text-6xl font-light mb-6 text-white leading-tight transform-gpu hover:scale-105 transition-transform duration-500">
+              Create stunning
+              <span className="block font-bold bg-gradient-to-r from-pink-500 via-orange-500 to-cyan-400 bg-clip-text text-transparent animate-gradient-x hover:scale-110 transition-transform duration-500">
+                short video content
+              </span>
+              in seconds
+            </h2>
+          </div>
+          <p className="text-xl text-gray-400 leading-relaxed max-w-2xl mx-auto transform-gpu hover:translate-y-1 transition-transform duration-300">
             Transform your videos into engaging content with AI-powered captions, hashtags, and descriptions for all short video platforms.
           </p>
         </div>
@@ -86,24 +139,24 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
             
-            {/* Main Upload CTA - Large */}
+            {/* Main Upload CTA - Medium */}
             <Card 
-              className="md:col-span-2 lg:col-span-3 bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-all duration-500 cursor-pointer group"
+              className="md:col-span-2 lg:col-span-2 bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-all duration-500 cursor-pointer group"
               onClick={() => setCurrentStep('upload')}
             >
-              <CardContent className="p-8 h-64 flex flex-col justify-center items-center text-center">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-cyan-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Upload className="w-8 h-8 text-white" />
+              <CardContent className="p-6 h-48 flex flex-col justify-center items-center text-center">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-cyan-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <Upload className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Upload Video</h3>
-                <p className="text-gray-400">Start creating amazing content</p>
+                <h3 className="text-xl font-bold text-white mb-2">Upload Video</h3>
+                <p className="text-sm text-gray-400">Start creating amazing content</p>
               </CardContent>
             </Card>
 
             {/* Feature Cards */}
             <Card className="bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-all duration-300">
-              <CardContent className="p-6 h-64 flex flex-col justify-center items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center mb-4">
+              <CardContent className="p-6 h-48 flex flex-col justify-center items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center mb-3">
                   <MessageSquare className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-white mb-2">Smart Captions</h4>
@@ -112,8 +165,8 @@ const Index = () => {
             </Card>
 
             <Card className="bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-all duration-300">
-              <CardContent className="p-6 h-64 flex flex-col justify-center items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-cyan-400 flex items-center justify-center mb-4">
+              <CardContent className="p-6 h-48 flex flex-col justify-center items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-cyan-400 flex items-center justify-center mb-3">
                   <Hash className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-white mb-2">Trending Tags</h4>
@@ -122,8 +175,8 @@ const Index = () => {
             </Card>
 
             <Card className="bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-all duration-300">
-              <CardContent className="p-6 h-64 flex flex-col justify-center items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-pink-500 flex items-center justify-center mb-4">
+              <CardContent className="p-6 h-48 flex flex-col justify-center items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-pink-500 flex items-center justify-center mb-3">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-white mb-2">Transcripts</h4>
@@ -132,15 +185,14 @@ const Index = () => {
             </Card>
 
             <Card className="bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-all duration-300">
-              <CardContent className="p-6 h-64 flex flex-col justify-center items-center text-center">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-cyan-400 flex items-center justify-center mb-4">
+              <CardContent className="p-6 h-48 flex flex-col justify-center items-center text-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-cyan-400 flex items-center justify-center mb-3">
                   <Copy className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-white mb-2">One-Click Copy</h4>
                 <p className="text-xs text-gray-400">Copy all content instantly</p>
               </CardContent>
             </Card>
-
           </div>
 
           {/* Platforms Support - Full Width */}
@@ -216,8 +268,8 @@ const Index = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
               <CardContent className="p-6 text-center">
-                <h4 className="text-2xl font-bold text-white mb-1">30s</h4>
-                <p className="text-xs text-gray-400">Max video length</p>
+                <h4 className="text-2xl font-bold text-white mb-1">50MB</h4>
+                <p className="text-xs text-gray-400">Max file size</p>
               </CardContent>
             </Card>
             <Card className="bg-white/5 border border-white/10 backdrop-blur-xl">
@@ -269,10 +321,7 @@ const Index = () => {
       <footer className="border-t border-white/10 bg-black/20 backdrop-blur-xl">
         <div className="container mx-auto px-6 py-8 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-5 h-5 rounded bg-gradient-to-r from-pink-500 to-cyan-400 flex items-center justify-center">
-              <Zap className="w-3 h-3 text-black fill-current" />
-            </div>
-            <span className="font-semibold text-white">Reelit</span>
+            <img src="/logo.png" alt="Reelit Logo" className="w-24 h-auto" />
           </div>
           <p className="text-sm text-gray-400">
             Student Project • Built for Short Video Creators
