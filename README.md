@@ -1,73 +1,95 @@
-# Welcome to your Lovable project
+# Reelit Content Hub
 
-## Project info
+A powerful content generation platform that processes videos, extracts audio, transcribes content, and generates engaging social media content using AI.
 
-**URL**: https://lovable.dev/projects/2da67d73-9f2d-45c9-b109-2e37ec2d2ee3
+## Features
 
-## How can I edit this code?
+- 🎥 Video upload and processing
+- 🔊 Audio extraction from videos
+- 📝 Automatic transcription using Whisper
+- 🤖 AI-powered content generation using OpenAI
+- ☁️ Cloud storage with AWS S3
+- 🔒 Secure file handling and cleanup
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Express
+- **AI/ML**: OpenAI GPT-3.5, Whisper
+- **Storage**: AWS S3
+- **Video Processing**: FFmpeg
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2da67d73-9f2d-45c9-b109-2e37ec2d2ee3) and start prompting.
+## Prerequisites
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js (v14 or higher)
+- AWS Account with S3 access
+- OpenAI API key
+- FFmpeg installed on your system
 
-**Use your preferred IDE**
+## Setup
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/reelit-content-hub-ui.git
+   cd reelit-content-hub-ui
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-Follow these steps:
+3. **Environment Setup**
+   - Copy `.env.example` to `.env`
+   - Fill in your credentials:
+     - OpenAI API key
+     - AWS credentials
+     - Other configuration values
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## API Endpoints
 
-# Step 3: Install the necessary dependencies.
-npm i
+### POST /api/upload
+Upload and process a video file.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+**Request:**
+- Method: POST
+- Content-Type: multipart/form-data
+- Body: video file
+
+**Response:**
+```json
+{
+  "message": "Video processed successfully",
+  "videoUrl": "signed-s3-url-for-video",
+  "audioUrl": "signed-s3-url-for-audio",
+  "transcription": "transcribed text",
+  "generatedContent": "AI-generated content"
+}
 ```
 
-**Edit a file directly in GitHub**
+## Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+See `.env.example` for all required environment variables.
 
-**Use GitHub Codespaces**
+## Contributing
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## What technologies are used for this project?
+## License
 
-This project is built with:
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Acknowledgments
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2da67d73-9f2d-45c9-b109-2e37ec2d2ee3) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- OpenAI for GPT-3.5 and Whisper
+- AWS for S3 storage
+- FFmpeg for video processing
