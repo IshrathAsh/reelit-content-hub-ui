@@ -2,6 +2,7 @@ import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } fro
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import fs from 'fs/promises';
 import path from 'path';
+import { createWriteStream } from 'fs';
 
 class S3Service {
     constructor() {
@@ -17,6 +18,7 @@ class S3Service {
 
     async uploadFile(filePath, key) {
         try {
+            console.log('Uploading file to S3:', { filePath, key });
             const fileContent = await fs.readFile(filePath);
             
             const command = new PutObjectCommand({
@@ -26,6 +28,7 @@ class S3Service {
             });
 
             await this.s3Client.send(command);
+            console.log('File uploaded successfully');
             return {
                 success: true,
                 key: key
@@ -39,14 +42,55 @@ class S3Service {
         }
     }
 
+    async downloadFile(key, localPath) {
+        try {
+            console.log('Downloading file from S3:', { key, localPath });
+            const command = new GetObjectCommand({
+                Bucket: this.bucketName,
+                Key: key
+            });
+
+            const response = await this.s3Client.send(command);
+            
+            return new Promise((resolve, reject) => {
+                const writeStream = createWriteStream(localPath);
+                response.Body.pipe(writeStream);
+                
+                writeStream.on('finish', () => {
+                    console.log('File downloaded successfully');
+                    resolve({
+                        success: true,
+                        path: localPath
+                    });
+                });
+                
+                writeStream.on('error', (error) => {
+                    console.error('Error writing file:', error);
+                    reject({
+                        success: false,
+                        error: error.message
+                    });
+                });
+            });
+        } catch (error) {
+            console.error('Error downloading from S3:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
     async getSignedUrl(key) {
         try {
+            console.log('Generating signed URL for:', key);
             const command = new GetObjectCommand({
                 Bucket: this.bucketName,
                 Key: key
             });
 
             const signedUrl = await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+            console.log('Signed URL generated successfully');
             return {
                 success: true,
                 url: signedUrl
@@ -62,12 +106,14 @@ class S3Service {
 
     async deleteFile(key) {
         try {
+            console.log('Deleting file from S3:', key);
             const command = new DeleteObjectCommand({
                 Bucket: this.bucketName,
                 Key: key
             });
 
             await this.s3Client.send(command);
+            console.log('File deleted successfully');
             return {
                 success: true
             };
