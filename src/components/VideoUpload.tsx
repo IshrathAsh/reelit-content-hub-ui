@@ -56,11 +56,40 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
     }
   };
 
-  const simulateAIProcessing = async () => {
+  const handleProcess = async () => {
+    if (!selectedFile) {
+      toast({
+        title: "No file selected",
+        description: "Please select a video file to process.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsProcessing(true);
       setProgress(0);
 
+      // Create form data
+      const formData = new FormData();
+      formData.append('video', selectedFile);
+      if (customPrompt) {
+        formData.append('prompt', customPrompt);
+      }
+
+      // Make API call to backend
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process video');
+      }
+
+      const data = await response.json();
+
+      // Update progress based on processing steps
       const steps = [
         { message: "Analyzing video...", progress: 10 },
         { message: "Extracting audio...", progress: 25 },
@@ -72,10 +101,7 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
       ];
 
       for (const step of steps) {
-        // Simulate variable processing time
-        const delay = Math.random() * 1000 + 500; // Random delay between 500ms and 1500ms
-        await new Promise(resolve => setTimeout(resolve, delay));
-        
+        await new Promise(resolve => setTimeout(resolve, 500));
         setProgress(step.progress);
         toast({
           title: step.message,
@@ -83,30 +109,15 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
         });
       }
 
-      // Simulate a small delay before completion
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const mockContent = {
-        transcript: "Hey everyone! Today I'm sharing my morning routine that has completely transformed my productivity. Starting with a 5-minute meditation, then a quick workout, and finishing with a healthy breakfast. Try it out and let me know how it works for you!",
-        caption: "✨ Morning routine that changed my life! Who else loves starting the day right? 🌅",
-        hashtags: ["#morningroutine", "#productivity", "#wellness", "#motivation", "#lifestyle", "#selfcare", "#healthyhabits", "#mindfulness"],
-        description: "Transform your mornings with this simple routine! Meditation + exercise + healthy breakfast = unstoppable energy all day long.",
+      // Pass the generated content to parent component
+      onContentGenerated({
+        transcript: data.transcription,
+        caption: data.generatedContent.caption,
+        hashtags: data.generatedContent.hashtags,
+        description: data.generatedContent.description,
         videoFile: selectedFile
-      };
+      });
 
-      // Apply custom prompt if provided
-      if (customPrompt) {
-        const prompt = customPrompt.toLowerCase();
-        if (prompt.includes('funny')) {
-          mockContent.caption = "😂 My morning routine be like: snooze, panic, coffee, pretend I'm productive ☕";
-        } else if (prompt.includes('professional')) {
-          mockContent.caption = "📈 Elevate your morning routine with these proven productivity techniques. Transform your day before it begins.";
-        } else if (prompt.includes('tiktok')) {
-          mockContent.caption = "POV: When you finally find the perfect morning routine 🎯 #morningroutine #productivity";
-        }
-      }
-
-      onContentGenerated(mockContent);
     } catch (error) {
       console.error('Processing failed:', error);
       toast({
@@ -117,18 +128,6 @@ export const VideoUpload = ({ onContentGenerated, onBack }: VideoUploadProps) =>
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const handleProcess = () => {
-    if (!selectedFile) {
-      toast({
-        title: "No file selected",
-        description: "Please select a video file to process.",
-        variant: "destructive",
-      });
-      return;
-    }
-    simulateAIProcessing();
   };
 
   return (

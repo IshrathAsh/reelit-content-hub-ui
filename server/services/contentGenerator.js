@@ -1,6 +1,6 @@
-const { OpenAI } = require('openai');
-const fs = require('fs').promises;
-const path = require('path');
+import { OpenAI } from 'openai';
+import fs from 'fs/promises';
+import path from 'path';
 
 class ContentGenerator {
     constructor() {
@@ -11,14 +11,14 @@ class ContentGenerator {
 
     async generateContent(transcription) {
         try {
-            const prompt = `Analyze the following video transcription and generate comprehensive social media content:\n\n${transcription}\n\nPlease provide:\n1. Main Topic Analysis\n2. Key Points Summary\n3. Content Structure:\n   - Catchy Title\n   - Engaging Description\n   - Key Takeaways\n   - Call to Action\n4. Social Media Optimization:\n   - 5-7 Relevant Hashtags\n   - Best Platform Recommendations\n   - Optimal Posting Time\n5. Engagement Strategy:\n   - Suggested Questions for Comments\n   - Engagement Hooks\n   - Content Repurposing Ideas`;
+            const prompt = `Analyze the following video transcription and generate social media content:\n\n${transcription}\n\nPlease provide:\n1. A catchy caption (1-2 sentences)\n2. 5-7 relevant hashtags\n3. A detailed description (2-3 sentences)`;
 
             const completion = await this.openai.chat.completions.create({
                 model: "gpt-3.5-turbo",
                 messages: [
                     {
                         role: "system",
-                        content: "You are an expert social media content strategist and analyst. Your task is to analyze video content and create comprehensive, engaging social media strategies. Provide detailed, actionable insights and structured content recommendations."
+                        content: "You are an expert social media content strategist. Create engaging, platform-optimized content that captures attention and drives engagement."
                     },
                     {
                         role: "user",
@@ -26,16 +26,35 @@ class ContentGenerator {
                     }
                 ],
                 temperature: 0.7,
-                max_tokens: 1000
+                max_tokens: 500
             });
 
-            // Parse the response into a structured format
+            // Parse the response into sections
             const content = completion.choices[0].message.content;
-            const sections = this.parseContentIntoSections(content);
+            const sections = content.split('\n\n');
+            
+            const structuredContent = {
+                caption: '',
+                hashtags: [],
+                description: ''
+            };
+
+            sections.forEach(section => {
+                if (section.includes('Caption:')) {
+                    structuredContent.caption = section.split('Caption:')[1]?.trim() || '';
+                } else if (section.includes('Hashtags:')) {
+                    const hashtags = section.split('Hashtags:')[1]?.trim() || '';
+                    structuredContent.hashtags = hashtags.split(' ')
+                        .filter(tag => tag.trim())
+                        .map(tag => tag.startsWith('#') ? tag : `#${tag}`);
+                } else if (section.includes('Description:')) {
+                    structuredContent.description = section.split('Description:')[1]?.trim() || '';
+                }
+            });
 
             return {
                 success: true,
-                content: sections
+                content: structuredContent
             };
         } catch (error) {
             console.error('Error generating content:', error);
@@ -138,4 +157,4 @@ class ContentGenerator {
     }
 }
 
-module.exports = new ContentGenerator(); 
+export default new ContentGenerator(); 

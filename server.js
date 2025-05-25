@@ -1,10 +1,19 @@
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-require('dotenv').config();
-const s3Service = require('./server/services/s3Service');
+import express from 'express';
+import cors from 'cors';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+import s3Service from './server/services/s3Service.js';
+
+// ES Module __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables
+dotenv.config();
 
 // Create required directories if they don't exist
 const createRequiredDirectories = () => {
@@ -82,8 +91,8 @@ app.post('/api/upload', upload.single('video'), async (req, res) => {
         console.log(`Processing video: ${req.file.originalname}`);
 
         // Process the video
-        const videoProcessor = require('./server/services/videoProcessor');
-        const result = await videoProcessor.processVideo(req.file);
+        const videoProcessor = await import('./server/services/videoProcessor.js');
+        const result = await videoProcessor.default.processVideo(req.file);
 
         if (!result.success) {
             console.error('Video processing failed:', result.error);
@@ -115,8 +124,8 @@ app.post('/api/upload', upload.single('video'), async (req, res) => {
         // Download audio for transcription
         console.log('Downloading audio for transcription...');
         const audioTempPath = path.join(process.env.TEMP_DIR || 'server/temp', `${Date.now()}-audio.mp3`);
-        const { GetObjectCommand } = require('@aws-sdk/client-s3');
-        const { createWriteStream } = require('fs');
+        const { GetObjectCommand } = await import('@aws-sdk/client-s3');
+        const { createWriteStream } = fs;
         const s3Client = s3Service.s3Client;
         
         try {
@@ -135,8 +144,8 @@ app.post('/api/upload', upload.single('video'), async (req, res) => {
 
             console.log('Audio downloaded, starting transcription...');
 
-            const transcriptionService = require('./server/services/transcriptionService');
-            const transcriptionResult = await transcriptionService.transcribeAudio(audioTempPath);
+            const transcriptionService = await import('./server/services/transcriptionService.js');
+            const transcriptionResult = await transcriptionService.default.transcribeAudio(audioTempPath);
 
             // Clean up temp audio file
             await fs.promises.unlink(audioTempPath).catch(err => 
@@ -151,8 +160,8 @@ app.post('/api/upload', upload.single('video'), async (req, res) => {
             console.log('Transcription completed, generating content...');
 
             // Generate content from transcription
-            const contentGenerator = require('./server/services/contentGenerator');
-            const contentResult = await contentGenerator.generateContent(transcriptionResult.transcription);
+            const contentGenerator = await import('./server/services/contentGenerator.js');
+            const contentResult = await contentGenerator.default.generateContent(transcriptionResult.transcription);
 
             if (!contentResult.success) {
                 console.error('Content generation failed:', contentResult.error);
@@ -167,7 +176,11 @@ app.post('/api/upload', upload.single('video'), async (req, res) => {
                 videoUrl: videoUrlResult.url,
                 audioUrl: audioUrlResult.url,
                 transcription: transcriptionResult.transcription,
-                generatedContent: contentResult.content,
+                generatedContent: {
+                    caption: contentResult.content.caption,
+                    hashtags: contentResult.content.hashtags,
+                    description: contentResult.content.description
+                },
                 processingTime: `${processingTime}ms`
             });
         } catch (error) {

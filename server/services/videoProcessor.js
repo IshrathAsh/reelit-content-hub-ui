@@ -1,8 +1,8 @@
-const ffmpeg = require('fluent-ffmpeg');
-const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-const path = require('path');
-const fs = require('fs').promises;
-const s3Service = require('./s3Service');
+import ffmpeg from 'fluent-ffmpeg';
+import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
+import path from 'path';
+import fs from 'fs/promises';
+import s3Service from './s3Service.js';
 
 // Set ffmpeg path
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
@@ -79,4 +79,4 @@ class VideoProcessor {
     }
 }
 
-module.exports = new VideoProcessor();
+export default new VideoProcessor();

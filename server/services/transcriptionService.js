@@ -1,6 +1,11 @@
-const { Whisper } = require('whisper-node');
-const fs = require('fs').promises;
-const path = require('path');
+import { Whisper } from 'whisper-node';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 class TranscriptionService {
     constructor() {
@@ -29,4 +34,4 @@ class TranscriptionService {
     }
 }
 
-module.exports = new TranscriptionService(); 
+export default new TranscriptionService(); 
