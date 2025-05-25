@@ -16,7 +16,8 @@
     "server:dev": "nodemon --exec ts-node server/index.ts",
     "server:build": "tsc -p server/tsconfig.json",
     "server:start": "node dist/server/index.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "vercel-build": "npm run build && npm run server:build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.817.0",

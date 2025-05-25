@@ -6,6 +6,23 @@ const fs = require('fs');
 require('dotenv').config();
 const s3Service = require('./server/services/s3Service');
 
+// Create required directories if they don't exist
+const createRequiredDirectories = () => {
+    const dirs = [
+        process.env.UPLOADS_DIR || 'server/uploads',
+        process.env.TEMP_DIR || 'server/temp'
+    ];
+    
+    dirs.forEach(dir => {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+    });
+};
+
+// Initialize directories
+createRequiredDirectories();
+
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -13,13 +30,21 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Request logging middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
 // Configure multer for video upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, process.env.UPLOADS_DIR || 'server/uploads');
+        const uploadDir = process.env.UPLOADS_DIR || 'server/uploads';
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+        cb(null, `${uniqueSuffix}-${file.originalname}`);
     }
 });
 
@@ -33,92 +58,155 @@ const upload = multer({
         if (allowedTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('Invalid file type. Only video files are allowed.'));
+            cb(new Error(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`));
         }
     }
 });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 // Routes
 app.post('/api/upload', upload.single('video'), async (req, res) => {
+    const startTime = Date.now();
+    console.log('Starting video upload process...');
+    
     try {
         if (!req.file) {
+            console.error('No video file uploaded');
             return res.status(400).json({ error: 'No video file uploaded' });
         }
+
+        console.log(`Processing video: ${req.file.originalname}`);
 
         // Process the video
         const videoProcessor = require('./server/services/videoProcessor');
         const result = await videoProcessor.processVideo(req.file);
 
         if (!result.success) {
+            console.error('Video processing failed:', result.error);
             return res.status(500).json({ error: result.error });
         }
 
+        console.log('Video processed successfully, generating signed URLs...');
+
         // Generate signed URLs for video and audio
-        const videoUrlResult = await s3Service.getSignedUrl(result.videoKey);
-        const audioUrlResult = await s3Service.getSignedUrl(result.audioKey);
+        const [videoUrlResult, audioUrlResult] = await Promise.all([
+            s3Service.getSignedUrl(result.videoKey),
+            s3Service.getSignedUrl(result.audioKey)
+        ]);
 
         if (!videoUrlResult.success || !audioUrlResult.success) {
-            return res.status(500).json({ error: videoUrlResult.error || audioUrlResult.error });
+            console.error('Failed to generate signed URLs:', {
+                videoError: videoUrlResult.error,
+                audioError: audioUrlResult.error
+            });
+            return res.status(500).json({ 
+                error: 'Failed to generate signed URLs',
+                details: {
+                    videoError: videoUrlResult.error,
+                    audioError: audioUrlResult.error
+                }
+            });
         }
 
-        // Transcribe the audio (download from S3)
-        // Download audio file from S3 to temp for transcription
+        // Download audio for transcription
+        console.log('Downloading audio for transcription...');
         const audioTempPath = path.join(process.env.TEMP_DIR || 'server/temp', `${Date.now()}-audio.mp3`);
         const { GetObjectCommand } = require('@aws-sdk/client-s3');
         const { createWriteStream } = require('fs');
         const s3Client = s3Service.s3Client;
-        const audioStream = await s3Client.send(new GetObjectCommand({
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: result.audioKey
-        }));
-        await new Promise((resolve, reject) => {
-            const writeStream = createWriteStream(audioTempPath);
-            audioStream.Body.pipe(writeStream);
-            audioStream.Body.on('error', reject);
-            writeStream.on('finish', resolve);
-            writeStream.on('error', reject);
-        });
+        
+        try {
+            const audioStream = await s3Client.send(new GetObjectCommand({
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: result.audioKey
+            }));
+            
+            await new Promise((resolve, reject) => {
+                const writeStream = createWriteStream(audioTempPath);
+                audioStream.Body.pipe(writeStream);
+                audioStream.Body.on('error', reject);
+                writeStream.on('finish', resolve);
+                writeStream.on('error', reject);
+            });
 
-        const transcriptionService = require('./server/services/transcriptionService');
-        const transcriptionResult = await transcriptionService.transcribeAudio(audioTempPath);
+            console.log('Audio downloaded, starting transcription...');
 
-        // Clean up temp audio file
-        await fs.promises.unlink(audioTempPath);
+            const transcriptionService = require('./server/services/transcriptionService');
+            const transcriptionResult = await transcriptionService.transcribeAudio(audioTempPath);
 
-        if (!transcriptionResult.success) {
-            return res.status(500).json({ error: transcriptionResult.error });
+            // Clean up temp audio file
+            await fs.promises.unlink(audioTempPath).catch(err => 
+                console.warn('Failed to delete temp audio file:', err)
+            );
+
+            if (!transcriptionResult.success) {
+                console.error('Transcription failed:', transcriptionResult.error);
+                return res.status(500).json({ error: transcriptionResult.error });
+            }
+
+            console.log('Transcription completed, generating content...');
+
+            // Generate content from transcription
+            const contentGenerator = require('./server/services/contentGenerator');
+            const contentResult = await contentGenerator.generateContent(transcriptionResult.transcription);
+
+            if (!contentResult.success) {
+                console.error('Content generation failed:', contentResult.error);
+                return res.status(500).json({ error: contentResult.error });
+            }
+
+            const processingTime = Date.now() - startTime;
+            console.log(`Video processing completed in ${processingTime}ms`);
+
+            res.json({
+                message: 'Video processed successfully',
+                videoUrl: videoUrlResult.url,
+                audioUrl: audioUrlResult.url,
+                transcription: transcriptionResult.transcription,
+                generatedContent: contentResult.content,
+                processingTime: `${processingTime}ms`
+            });
+        } catch (error) {
+            console.error('Error during audio processing:', error);
+            // Clean up temp file if it exists
+            if (fs.existsSync(audioTempPath)) {
+                await fs.promises.unlink(audioTempPath).catch(err => 
+                    console.warn('Failed to delete temp audio file:', err)
+                );
+            }
+            throw error;
         }
-
-        // Generate content from transcription
-        const contentGenerator = require('./server/services/contentGenerator');
-        const contentResult = await contentGenerator.generateContent(transcriptionResult.transcription);
-
-        if (!contentResult.success) {
-            return res.status(500).json({ error: contentResult.error });
-        }
-
-        res.json({
-            message: 'Video processed successfully',
-            videoUrl: videoUrlResult.url,
-            audioUrl: audioUrlResult.url,
-            transcription: transcriptionResult.transcription,
-            generatedContent: contentResult.content
-        });
     } catch (error) {
         console.error('Error processing video:', error);
-        res.status(500).json({ error: 'Error processing video' });
+        res.status(500).json({ 
+            error: 'Error processing video',
+            details: error.message
+        });
     }
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('Unhandled error:', {
+        error: err.message,
+        stack: err.stack,
+        timestamp: new Date().toISOString()
+    });
+    
     res.status(500).json({
-        error: err.message || 'Something went wrong!'
+        error: 'Internal server error',
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong!'
     });
 });
 
 // Start server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Upload directory: ${process.env.UPLOADS_DIR || 'server/uploads'}`);
+    console.log(`Temp directory: ${process.env.TEMP_DIR || 'server/temp'}`);
 }); 

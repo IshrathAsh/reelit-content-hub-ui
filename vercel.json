@@ -5,7 +5,8 @@
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
-        "nodeVersion": "18.x"
+        "nodeVersion": "18.x",
+        "includeFiles": ["server/**"]
       }
     },
     {
@@ -13,7 +14,8 @@
       "use": "@vercel/static-build",
       "config": {
         "distDir": "dist",
-        "buildCommand": "npm run build"
+        "buildCommand": "npm run build",
+        "installCommand": "npm install --legacy-peer-deps"
       }
     }
   ],
@@ -21,6 +23,9 @@
     {
       "src": "/api/(.*)",
       "dest": "server.js"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
