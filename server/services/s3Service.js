@@ -14,6 +14,12 @@ class S3Service {
             }
         });
         this.bucketName = process.env.AWS_BUCKET_NAME;
+        console.log('\n=== S3 Service Initialization Check ===');
+        console.log(`Bucket Name from .env: ${this.bucketName}`);
+        console.log(`AWS Region from .env: ${process.env.AWS_REGION}`);
+        console.log(`AWS Access Key ID from .env: ${process.env.AWS_ACCESS_KEY_ID ? 'Loaded' : 'NOT LOADED'}`);
+        console.log('=======================================');
+       
     }
 
     async uploadFile(filePath, key) {
@@ -127,4 +133,4 @@ class S3Service {
     }
 }
 
-export default new S3Service(); 
+export default S3Service; 
